@@ -2,296 +2,638 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>L.S.M.C. | Panel EMS</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b1120;
-      color: #edf3fc;
-    }
-    .layout { display: flex; min-height: 100vh; }
-    aside {
-      width: 230px;
-      padding: 24px 16px;
-      background: #111a2b;
-      border-right: 1px solid #26344a;
-    }
-    .brand { color: #60a5fa; font-size: 24px; font-weight: bold; }
-    .subtitle { color: #91a2bb; font-size: 13px; margin: 8px 0 25px; }
-    nav button, .login, .primary {
-      padding: 12px;
-      border: 0;
-      border-radius: 8px;
-      cursor: pointer;
-      color: white;
-      background: #20304a;
-    }
-    nav button {
-      display: block;
-      width: 100%;
-      text-align: left;
-      margin: 6px 0;
-    }
-    nav button.active { background: #2563eb; }
-    .login, .primary { background: #2563eb; }
-    main { flex: 1; min-width: 0; padding: 28px; }
-    .muted { color: #91a2bb; }
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 15px;
-      margin: 22px 0;
-    }
-    .card, .panel {
-      padding: 20px;
-      background: #131d30;
-      border: 1px solid #26344a;
-      border-radius: 12px;
-      margin-bottom: 16px;
-    }
-    .number { font-size: 30px; margin-top: 10px; }
-    input, select {
-      padding: 11px;
-      max-width: 100%;
-      color: white;
-      background: #0b1120;
-      border: 1px solid #35445c;
-      border-radius: 8px;
-    }
-    form { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
-    .hidden { display: none !important; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 12px 8px; text-align: left; border-bottom: 1px solid #26344a; }
-    .table-wrap { overflow-x: auto; }
-    .notice { color: #fbbf24; }
-    @media(max-width:650px) {
-      .layout { display: block; }
-      aside { width: 100%; }
-      nav { display: flex; flex-wrap: wrap; }
-      nav button { width: auto; }
-      main { padding: 18px 12px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>L.S.M.C. — EMS Management</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0a1020;--side:#0d1527;--panel:#121d32;--panel2:#17243a;--line:#273650;--blue:#55a6ff;--text:#edf4ff;--muted:#8ea1bd;--accent:#55a6ff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.5;cursor:wait}
+.app{display:none;min-height:100vh}
+.sidebar{width:250px;position:fixed;inset:0 auto 0 0;background:var(--side);border-right:1px solid var(--line);padding:25px 16px;display:flex;flex-direction:column;z-index:5}
+.logo{display:flex;align-items:center;gap:12px;padding:0 8px 28px}
+.logo-mark{width:43px;height:43px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(140deg,#2d8cff,#55d8e7);color:#071222;font-weight:900;font-size:17px;box-shadow:0 8px 30px #268aff30}
+.logo-name{font-weight:850;font-size:18px;letter-spacing:1.4px}
+.logo-sub{font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:1.4px}
+.nav-label{color:#647893;font-size:10px;letter-spacing:1.8px;font-weight:800;padding:15px 12px 9px}
+.nav{display:grid;gap:5px}
+.nav button{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border:1px solid transparent;border-radius:10px;background:transparent;color:#91a4bf;text-align:left;transition:.18s}
+.nav button:hover{background:#17243a;color:white}
+.nav button.active{background:#193254;border-color:#294a70;color:#fff}
+.nav .ico{width:22px;text-align:center;font-size:17px}
+.nav button.active .ico{color:var(--accent)}
+.side-bottom{margin-top:auto}
+.secure-box{padding:14px;border:1px solid var(--line);border-radius:12px;background:#121d30;margin:12px 0}
+.dot{display:inline-block;width:7px;height:7px;background:#46d6a0;border-radius:50%;margin-right:7px}
+.secure-box p{color:var(--muted);font-size:11px;line-height:1.6;margin:9px 0 0}
+main{margin-left:250px;min-width:0}
+.topbar{height:78px;padding:0 34px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#0c1424d9;position:sticky;top:0;z-index:4;backdrop-filter:blur(16px)}
+.breadcrumb{font-size:12px;color:var(--muted)}
+.breadcrumb strong{color:var(--text);font-weight:650}
+.top-right{display:flex;align-items:center;gap:13px}
+.avatar-mini{width:35px;height:35px;border-radius:12px;display:grid;place-items:center;background:#203a5d;color:#b6dcff;font-weight:800}
+.page{padding:32px;max-width:1500px;margin:auto}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:26px}
+.eyebrow{font-size:10px;letter-spacing:2px;color:var(--accent);font-weight:850;text-transform:uppercase;margin-bottom:10px}
+h1{font-size:29px;letter-spacing:-.8px;margin:0 0 9px;font-weight:800}
+h2{font-size:17px;margin:0 0 5px}
+h3{font-size:14px;margin:0 0 8px}
+p{line-height:1.6}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);border-radius:9px;background:#17243a;color:#eaf3ff;padding:10px 14px;font-weight:650;transition:.18s}
+.btn:hover{border-color:#52749e;transform:translateY(-1px)}
+.btn.primary{background:var(--accent);color:#071426;border-color:transparent}
+.btn.danger{color:#ff9b9b;background:#3b202c;border-color:#643244}
+.btn.ghost{background:transparent}
+.btn.small-btn{padding:7px 10px;font-size:12px}
+.grid{display:grid;gap:17px}
+.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:20px}
+.panel{background:linear-gradient(145deg,#142038,#101a2d);border:1px solid var(--line);border-radius:15px;padding:20px;min-width:0}
+.stat-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px}
+.stat-icon{width:36px;height:36px;border-radius:11px;background:#20395a;color:#8dc9ff;display:grid;place-items:center;font-size:17px}
+.stat-number{font-size:30px;font-weight:800;letter-spacing:-1px;margin:17px 0 5px}
+.stat-foot{font-size:11px;color:var(--muted)}
+.dashboard-grid{grid-template-columns:minmax(0,1.45fr) minmax(260px,1fr)}
+.welcome{position:relative;overflow:hidden;background:radial-gradient(ellipse at 95% 0%,#285c8770,transparent 48%),linear-gradient(120deg,#152844,#111b2e)}
+.welcome h2{font-size:23px;max-width:420px;line-height:1.3;margin:9px 0}
+.welcome p{max-width:450px;color:#a6bad3}
+.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid #345779;background:#17304c;color:#a9d5ff;border-radius:100px;padding:6px 10px;font-size:11px;font-weight:700}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px}
+.activity{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #243149}
+.activity:last-child{border-bottom:0}
+.activity-icon{width:35px;height:35px;border-radius:10px;background:#1e3049;display:grid;place-items:center;flex-shrink:0}
+.activity p{margin:0;font-size:12px}
+.activity small{color:var(--muted)}
+.quick-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.quick{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:15px;border-radius:12px;background:#121e32;border:1px solid var(--line);color:var(--text)}
+.quick:hover{border-color:#4676a9}
+.quick-icon{font-size:20px}
+.quick strong{display:block;font-size:12px}
+.quick small{display:block;color:var(--muted);margin-top:4px;font-size:11px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.field{display:grid;gap:7px;min-width:0}
+.field label{font-size:11px;color:#aabbd1;font-weight:700}
+.field input,.field select,.field textarea,.toolbar input,.toolbar select{width:100%;min-width:0;background:#0b1425;color:var(--text);border:1px solid #2b3c56;border-radius:9px;padding:11px 12px;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus,.toolbar input:focus,.toolbar select:focus{border-color:var(--accent);box-shadow:0 0 0 3px #55a6ff18}
+.field input[type=file]{font-size:11px}
+.form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:16px 0}
+.form-actions{display:flex;gap:9px;flex-wrap:wrap}
+.search{flex:1;min-width:180px}
+.employee-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.employee-card{padding:0;overflow:hidden}
+.employee-cover{height:70px;background:linear-gradient(110deg,#193b5a,#182943 65%,#234b64)}
+.employee-body{padding:0 17px 17px}
+.employee-photo{width:67px;height:67px;object-fit:cover;border-radius:17px;border:3px solid #142038;background:#223752;margin-top:-34px;display:grid;place-items:center;color:#a8d9ff;font-size:20px;font-weight:800}
+.employee-info{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-top:12px}
+.employee-info h3{font-size:15px;margin:0 0 5px}
+.employee-meta{color:var(--muted);font-size:11px;line-height:1.8;margin:12px 0}
+.status{display:inline-flex;align-items:center;border-radius:100px;padding:5px 8px;font-size:10px;font-weight:800;background:#173c34;color:#74e3bd}
+.status.inactive{background:#3b2c22;color:#ffc58c}
+.card-actions{display:flex;gap:7px;flex-wrap:wrap}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;white-space:nowrap}
+th{text-align:left;font-size:10px;color:#8094b0;text-transform:uppercase;letter-spacing:1px;font-weight:800}
+th,td{padding:14px 12px;border-bottom:1px solid #26334a}
+td{font-size:12px;color:#d7e3f4}
+tbody tr:hover{background:#ffffff04}
+.vehicle-symbol{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#20334e;margin-right:10px}
+.vehicle-name{display:inline-flex;align-items:center}
+.doc-row{display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #26334a}
+.doc-row:last-child{border-bottom:0}
+.doc-icon{width:43px;height:48px;display:grid;place-items:center;background:#233752;border-radius:9px;font-size:21px;flex-shrink:0}
+.doc-info{flex:1;min-width:0}
+.doc-info strong{display:block;overflow-wrap:anywhere;font-size:12px}
+.doc-info small{display:block;color:var(--muted);margin-top:5px;font-size:11px}
+.empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed #33435d;border-radius:12px}
+.empty span{font-size:25px;display:block;margin-bottom:9px}
+.settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.color-row{display:flex;align-items:center;gap:12px;margin:12px 0}
+.color-row input[type=color]{width:45px;height:38px;padding:3px;background:#0b1425;border:1px solid var(--line);border-radius:8px}
+.login-screen{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(ellipse at 50% 15%,#173c60 0%,#0b1425 45%,#080d18 100%)}
+.login-card{width:min(450px,100%);padding:35px;background:#101b2d;border:1px solid #30425d;border-radius:22px;text-align:center;box-shadow:0 25px 90px #0005}
+.login-card .logo-mark{margin:0 auto 20px;width:60px;height:60px;font-size:22px}
+.login-card h1{font-size:25px}
+.login-card p{color:var(--muted)}
+.login-card .btn{width:100%;margin-top:14px;padding:13px}
+#toast{position:fixed;right:22px;bottom:22px;z-index:20;background:#193d36;border:1px solid #327763;color:#c8ffeb;padding:14px 18px;border-radius:12px;max-width:min(400px,90vw);box-shadow:0 10px 40px #0005;display:none}
+#toast.error{background:#452530;border-color:#804052;color:#ffd6df}
+.hidden{display:none!important}
+@media(max-width:1150px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.employee-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.page{padding:24px}}
+@media(max-width:760px){.sidebar{position:static;width:100%;padding:15px}.logo{padding-bottom:13px}.side-bottom{display:none}.nav-label{padding-top:7px}.nav{grid-template-columns:repeat(3,minmax(0,1fr))}.nav button{font-size:11px;justify-content:center;flex-direction:column;gap:4px;padding:9px 4px}.nav .ico{font-size:16px}.topbar{height:57px;padding:0 16px}.page{padding:19px 13px}.page-head{flex-direction:column}.dashboard-grid,.settings-grid{grid-template-columns:1fr}.employee-grid{grid-template-columns:1fr}.quick-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr 1fr}h1{font-size:25px}}
+@media(max-width:420px){.stats{grid-template-columns:1fr 1fr;gap:9px}.panel{padding:14px}.stat-number{font-size:25px}.form-grid{grid-template-columns:1fr}.nav{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
 </head>
 <body>
-<div class="layout">
-  <aside>
-    <div class="brand">L.S.M.C.</div>
-    <div class="subtitle">Gestion hospitalière EMS</div>
-    <button id="discordLogin" class="login">Connexion avec Discord</button>
-    <p id="loginStatus" class="muted">Connexion non vérifiée</p>
-    <nav>
-      <button class="active" data-page="dashboard">Tableau de bord</button>
-      <button data-page="employees">Employés</button>
-      <button data-page="vehicles">Véhicules</button>
-      <button data-page="grades">Grades</button>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="logo-mark">LS</div>
+    <div class="eyebrow">Medical management system</div>
+    <h1>Bienvenue au L.S.M.C.</h1>
+    <p>Le centre de gestion du personnel, du parc automobile et des documents médicaux.</p>
+    <div class="pill">● Accès sécurisé par Discord</div>
+    <button id="loginBtn" class="btn primary">Connexion avec Discord ↗</button>
+    <p id="loginMessage" class="small">Connecte-toi avec un compte possédant le rôle Accès Panel.</p>
+  </div>
+</div>
+
+<div id="app" class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">LS</div>
+      <div><div class="logo-name">L.S.M.C.</div><div class="logo-sub">EMS MANAGEMENT</div></div>
+    </div>
+    <div class="nav-label">ESPACE DE TRAVAIL</div>
+    <nav class="nav">
+      <button class="active" data-page="dashboard"><span class="ico">◫</span>Vue générale</button>
+      <button data-page="employees"><span class="ico">♙</span>Personnel</button>
+      <button data-page="vehicles"><span class="ico">▰</span>Véhicules</button>
+      <button data-page="documents"><span class="ico">▤</span>Documents</button>
+      <button data-page="grades"><span class="ico">✳</span>Hiérarchie</button>
+      <button data-page="settings"><span class="ico">⚙</span>Paramètres</button>
     </nav>
+    <div class="side-bottom">
+      <div class="secure-box">
+        <span class="dot"></span><strong style="font-size:12px">Session protégée</strong>
+        <p>Accès réservé aux membres autorisés du L.S.M.C.</p>
+      </div>
+      <button id="logoutBtn" class="btn ghost" style="width:100%">↪ Déconnexion</button>
+      <p class="muted small" style="padding:0 8px">L.S.M.C. · Internal system</p>
+    </div>
   </aside>
 
   <main>
-    <section id="dashboard">
-      <h1>Tableau de bord</h1>
-      <p class="muted">Bienvenue dans le panel de gestion du L.S.M.C.</p>
-      <div class="cards">
-        <div class="card">Employés enregistrés<div class="number" id="employeeCount">0</div></div>
-        <div class="card">Véhicules enregistrés<div class="number" id="vehicleCount">0</div></div>
-        <div class="card">Grades<div class="number">8</div></div>
-      </div>
-      <div class="panel">
-        <h3>Bienvenue au L.S.M.C.</h3>
-        <p class="muted">Connecte-toi avec Discord pour commencer.</p>
-        <p class="notice">Les données ne sont pas encore enregistrées dans la base de données.</p>
-      </div>
-    </section>
+    <header class="topbar">
+      <div class="breadcrumb">L.S.M.C. <span style="padding:0 7px">/</span> <strong id="crumb">Vue générale</strong></div>
+      <div class="top-right"><span class="pill"><span class="dot"></span>En ligne</span><div class="avatar-mini">LS</div></div>
+    </header>
 
-    <section id="employees" class="hidden">
-      <h1>Gestion des employés</h1>
-      <form id="employeeForm">
-        <input id="employeeName" placeholder="Nom et prénom" required maxlength="80">
-        <select id="employeeGrade">
-          <option>Directeur</option>
-          <option>Directeur Adjoint</option>
-          <option>Superviseur</option>
-          <option>Chef De Service</option>
-          <option>Recruteur Formateur</option>
-          <option>Medecin</option>
-          <option>Interne en Médecine</option>
-          <option>Ambulancier</option>
-        </select>
-        <button class="primary" type="submit">Ajouter</button>
-      </form>
-      <div class="panel table-wrap">
-        <table>
-          <thead><tr><th>Nom</th><th>Grade</th><th>Action</th></tr></thead>
-          <tbody id="employeeRows"></tbody>
-        </table>
-      </div>
-    </section>
+    <div class="page">
+      <section id="page-dashboard">
+        <div class="page-head">
+          <div><div class="eyebrow">Centre de commandement</div><h1>Vue générale</h1><div class="muted">Toutes les informations importantes de ton service, au même endroit.</div></div>
+          <button class="btn primary" onclick="showPage('employees')">＋ Gérer le personnel</button>
+        </div>
+        <div class="grid stats">
+          <div class="panel"><div class="stat-top">Personnel actif <span class="stat-icon">♙</span></div><div class="stat-number" id="statEmployees">—</div><div class="stat-foot">Membres enregistrés</div></div>
+          <div class="panel"><div class="stat-top">Parc automobile <span class="stat-icon">▰</span></div><div class="stat-number" id="statVehicles">—</div><div class="stat-foot">Véhicules répertoriés</div></div>
+          <div class="panel"><div class="stat-top">Documents <span class="stat-icon">▤</span></div><div class="stat-number" id="statDocuments">—</div><div class="stat-foot">Fichiers déposés</div></div>
+          <div class="panel"><div class="stat-top">Grades <span class="stat-icon">✳</span></div><div class="stat-number" id="statGrades">8</div><div class="stat-foot">Niveaux hiérarchiques</div></div>
+        </div>
+        <div class="grid dashboard-grid">
+          <div class="panel welcome">
+            <span class="pill">✦ L.S.M.C. STAFF</span>
+            <h2>Un service organisé.<br>Une équipe prête à intervenir.</h2>
+            <p>Retrouve rapidement les informations du personnel, les véhicules de service et les documents internes.</p>
+            <button class="btn primary" onclick="showPage('vehicles')">Accéder au parc automobile →</button>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><h2>Accès rapides</h2><div class="muted small">Les outils du quotidien</div></div></div>
+            <div class="activity"><div class="activity-icon">♙</div><div><p><strong>Personnel</strong></p><small>Profils, grades et matricules</small><br><button class="btn small-btn" style="margin-top:8px" onclick="showPage('employees')">Ouvrir →</button></div></div>
+            <div class="activity"><div class="activity-icon">▤</div><div><p><strong>Documents médicaux</strong></p><small>Fichiers internes et dossiers</small><br><button class="btn small-btn" style="margin-top:8px" onclick="showPage('documents')">Ouvrir →</button></div></div>
+          </div>
+        </div>
+        <div class="grid quick-grid" style="margin-top:17px">
+          <button class="quick" onclick="showPage('employees')"><span class="quick-icon">＋</span><span><strong>Gérer un employé</strong><small>Créer ou modifier un profil</small></span></button>
+          <button class="quick" onclick="showPage('vehicles')"><span class="quick-icon">＋</span><span><strong>Ajouter un véhicule</strong><small>Compléter le parc EMS</small></span></button>
+          <button class="quick" onclick="showPage('documents')"><span class="quick-icon">↑</span><span><strong>Déposer un document</strong><small>Stockage privé de fichiers</small></span></button>
+        </div>
+      </section>
 
-    <section id="vehicles" class="hidden">
-      <h1>Gestion des véhicules</h1>
-      <form id="vehicleForm">
-        <select id="vehicleType">
-          <option>Ambulance</option>
-          <option>Véhicule médical d’intervention</option>
-          <option>Véhicule de commandement</option>
-          <option>Hélicoptère médical</option>
-          <option>Autre</option>
-        </select>
-        <input id="vehicleName" placeholder="Nom / modèle" required maxlength="80">
-        <input id="vehiclePlate" placeholder="Plaque" maxlength="20">
-        <button class="primary" type="submit">Ajouter</button>
-      </form>
-      <div class="panel table-wrap">
-        <table>
-          <thead><tr><th>Type</th><th>Véhicule</th><th>Plaque</th><th>Action</th></tr></thead>
-          <tbody id="vehicleRows"></tbody>
-        </table>
-      </div>
-    </section>
+      <section id="page-employees" class="hidden">
+        <div class="page-head"><div><div class="eyebrow">Ressources humaines</div><h1>Gestion du personnel</h1><div class="muted">Profils, photos, informations et grades des membres.</div></div></div>
+        <div class="panel">
+          <div class="panel-head"><div><h2 id="employeeFormTitle">Nouveau membre</h2><div class="muted small">Les champs marqués d'un * sont obligatoires.</div></div><span class="pill">PERSONNEL</span></div>
+          <form id="employeeForm">
+            <div class="form-grid">
+              <div class="field"><label>Prénom *</label><input id="firstName" required maxlength="80" placeholder="Prénom"></div>
+              <div class="field"><label>Nom *</label><input id="lastName" required maxlength="80" placeholder="Nom"></div>
+              <div class="field"><label>Grade *</label><select id="employeeGrade" required></select></div>
+              <div class="field"><label>Date de naissance</label><input id="birthDate" type="date"></div>
+              <div class="field"><label>ID en jeu</label><input id="gameId" maxlength="100" placeholder="ID / identifiant RP"></div>
+              <div class="field"><label>Date de recrutement</label><input id="recruitedAt" type="date"></div>
+              <div class="field"><label>Statut</label><select id="employeeStatus"><option value="Actif">Actif</option><option value="Inactif">Inactif</option><option value="En formation">En formation</option></select></div>
+              <div class="field"><label>Photo du membre</label><input id="employeePhoto" type="file" accept="image/jpeg,image/png,image/webp"></div>
+            </div>
+            <div class="form-actions"><button id="employeeSave" class="btn primary" type="submit">＋ Enregistrer le membre</button><button id="employeeCancel" class="btn hidden" type="button">Annuler la modification</button></div>
+          </form>
+        </div>
+        <div class="panel" style="margin-top:18px">
+          <div class="panel-head"><div><h2>Annuaire du personnel</h2><div class="muted small" id="employeeSummary">Chargement…</div></div></div>
+          <div class="toolbar"><input id="employeeSearch" class="search" placeholder="⌕  Rechercher un nom, ID ou grade…"><select id="gradeFilter" style="max-width:230px"><option value="">Tous les grades</option></select></div>
+          <div id="employeeCards" class="grid employee-grid"></div>
+        </div>
+      </section>
 
-    <section id="grades" class="hidden">
-      <h1>Hiérarchie des grades</h1>
-      <div class="panel">
-        <ol>
-          <li>Directeur</li>
-          <li>Directeur Adjoint</li>
-          <li>Superviseur</li>
-          <li>Chef De Service</li>
-          <li>Recruteur Formateur</li>
-          <li>Medecin</li>
-          <li>Interne en Médecine</li>
-          <li>Ambulancier</li>
-        </ol>
-      </div>
-    </section>
+      <section id="page-vehicles" class="hidden">
+        <div class="page-head"><div><div class="eyebrow">Logistique et intervention</div><h1>Parc automobile</h1><div class="muted">Gestion des véhicules, plaques et affectations.</div></div></div>
+        <div class="panel">
+          <div class="panel-head"><div><h2 id="vehicleFormTitle">Ajouter un véhicule</h2><div class="muted small">Les modifications sont sauvegardées dans la base.</div></div></div>
+          <form id="vehicleForm">
+            <div class="form-grid">
+              <div class="field"><label>Type de véhicule *</label><select id="vehicleType"><option>Ambulance</option><option>Véhicule médical d’intervention</option><option>Véhicule de commandement</option><option>Hélicoptère médical</option><option>Autre</option></select></div>
+              <div class="field"><label>Modèle / nom *</label><input id="vehicleModel" required maxlength="100" placeholder="Ex. Ambulance 01"></div>
+              <div class="field"><label>Plaque</label><input id="vehiclePlate" maxlength="30" placeholder="Plaque d'immatriculation"></div>
+              <div class="field"><label>Numéro d'unité</label><input id="unitNumber" maxlength="30" placeholder="Ex. EMS-01"></div>
+              <div class="field"><label>Propriétaire / responsable</label><select id="vehicleOwner"><option value="">Non attribué</option></select></div>
+              <div class="field"><label>Statut</label><select id="vehicleStatus"><option value="Disponible">Disponible</option><option value="En intervention">En intervention</option><option value="En maintenance">En maintenance</option><option value="Hors service">Hors service</option></select></div>
+            </div>
+            <div class="form-actions"><button id="vehicleSave" class="btn primary" type="submit">＋ Enregistrer le véhicule</button><button id="vehicleCancel" class="btn hidden" type="button">Annuler</button></div>
+          </form>
+        </div>
+        <div class="panel" style="margin-top:18px">
+          <div class="panel-head"><div><h2>Véhicules enregistrés</h2><div class="muted small" id="vehicleSummary">Chargement…</div></div></div>
+          <div class="toolbar"><input id="vehicleSearch" class="search" placeholder="⌕  Rechercher un véhicule ou une plaque…"><select id="vehicleFilter" style="max-width:240px"><option value="">Tous les types</option><option>Ambulance</option><option>Véhicule médical d’intervention</option><option>Véhicule de commandement</option><option>Hélicoptère médical</option><option>Autre</option></select></div>
+          <div class="table-wrap"><table><thead><tr><th>Véhicule</th><th>Type</th><th>Plaque / unité</th><th>Responsable</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="vehicleRows"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="page-documents" class="hidden">
+        <div class="page-head"><div><div class="eyebrow">Archives privées</div><h1>Documents médicaux</h1><div class="muted">Dépose et retrouve les fichiers internes de ton service.</div></div></div>
+        <div class="panel">
+          <div class="panel-head"><div><h2>Ajouter un document</h2><div class="muted small">PDF, images et documents bureautiques · 15 Mo maximum par fichier.</div></div><span class="pill">STOCKAGE PRIVÉ</span></div>
+          <form id="documentForm">
+            <div class="form-grid">
+              <div class="field"><label>Nom du document *</label><input id="documentTitle" required maxlength="150" placeholder="Ex. Fiche de procédure"></div>
+              <div class="field"><label>Catégorie</label><select id="documentCategory"><option>Procédure médicale</option><option>Fiche d'intervention</option><option>Formulaire</option><option>Rapport</option><option>Formation</option><option>Autre</option></select></div>
+              <div class="field"><label>Membre concerné</label><select id="documentEmployee"><option value="">Aucun membre associé</option></select></div>
+              <div class="field"><label>Fichier *</label><input id="documentFile" type="file" required accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx,.txt"></div>
+            </div>
+            <button id="documentSave" class="btn primary" type="submit">↑ Envoyer le document</button>
+          </form>
+        </div>
+        <div class="panel" style="margin-top:18px">
+          <div class="panel-head"><div><h2>Bibliothèque de documents</h2><div class="muted small" id="documentSummary">Chargement…</div></div></div>
+          <div class="toolbar"><input id="documentSearch" class="search" placeholder="⌕  Rechercher un document…"><select id="documentFilter" style="max-width:220px"><option value="">Toutes les catégories</option><option>Procédure médicale</option><option>Fiche d'intervention</option><option>Formulaire</option><option>Rapport</option><option>Formation</option><option>Autre</option></select></div>
+          <div id="documentList"></div>
+        </div>
+      </section>
+
+      <section id="page-grades" class="hidden">
+        <div class="page-head"><div><div class="eyebrow">Organisation du service</div><h1>Hiérarchie EMS</h1><div class="muted">La structure de grades utilisée pour classer le personnel.</div></div></div>
+        <div class="panel"><div class="panel-head"><div><h2>Ordre hiérarchique</h2><div class="muted small">Du plus haut niveau au plus bas.</div></div></div><div id="gradeList"></div></div>
+      </section>
+
+      <section id="page-settings" class="hidden">
+        <div class="page-head"><div><div class="eyebrow">Personnalisation</div><h1>Paramètres</h1><div class="muted">Adapte l'apparence du panel à ton service.</div></div></div>
+        <div class="grid settings-grid">
+          <div class="panel"><h2>Thème visuel</h2><p class="muted small">Choisis la couleur principale des boutons et éléments actifs.</p><div class="color-row"><input id="accentColor" type="color" value="#55a6ff"><div><strong>Couleur d'accent</strong><div class="muted small">Couleur des actions et des indicateurs</div></div></div><button id="saveTheme" class="btn primary">Enregistrer le thème</button><button id="resetTheme" class="btn" style="margin-left:7px">Réinitialiser</button></div>
+          <div class="panel"><h2>Session et accès</h2><p class="muted small">La connexion est gérée par Supabase et Discord. Le rôle Discord Accès Panel est vérifié côté serveur.</p><div class="pill"><span class="dot"></span>Authentification Discord</div><p class="muted small" id="sessionInfo" style="overflow-wrap:anywhere"></p><button id="settingsLogout" class="btn danger">Se déconnecter</button></div>
+          <div class="panel"><h2>Conseils de confidentialité</h2><p class="muted small">N'enregistre que les informations nécessaires à la gestion RP. Évite les véritables données de santé, dossiers médicaux réels, mots de passe ou documents confidentiels de personnes réelles.</p></div>
+        </div>
+      </section>
+    </div>
   </main>
 </div>
+<div id="toast"></div>
 
 <script>
-  const SUPABASE_URL = "https://ehtnwlgmpftsphzqmzia.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_6N5_91bX7PfPEljP3Y_7HQ_XZ6ah-1w";
-  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL = "https://ehtnwlgmpftsphzqmzia.supabase.co";
+const SUPABASE_KEY = "sb_publishable_6N5_91bX7PfPEljP3Y_7HQ_XZ6ah-1w";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const employeeList = [];
-  const vehicleList = [];
+const gradeDefaults = [
+  {name:"Directeur",level:8},{name:"Directeur Adjoint",level:7},
+  {name:"Superviseur",level:6},{name:"Chef De Service",level:5},
+  {name:"Recruteur Formateur",level:4},{name:"Medecin",level:3},
+  {name:"Interne en Médecine",level:2},{name:"Ambulancier",level:1}
+];
+let sessionUser = null, employees = [], grades = [], vehicles = [], documents = [];
+let editingEmployee = null, editingVehicle = null, busy = false;
 
-  document.querySelectorAll("nav button").forEach(button => {
-    button.addEventListener("click", () => {
-      document.querySelectorAll("main section").forEach(s => s.classList.add("hidden"));
-      document.getElementById(button.dataset.page).classList.remove("hidden");
-      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-      button.classList.add("active");
-    });
+const $ = id => document.getElementById(id);
+const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+const dateText = value => value ? new Date(value+"T00:00:00").toLocaleDateString("fr-FR") : "—";
+const initials = (a,b) => ((a||"?")[0]+(b||"")[0]).toUpperCase();
+const gradeName = id => grades.find(g => String(g.id) === String(id))?.name || "Grade non défini";
+const employeeName = id => {
+  const e = employees.find(x => String(x.id) === String(id));
+  return e ? `${e.first_name} ${e.last_name}` : "Non attribué";
+};
+function toast(message,error=false) {
+  const t=$("toast"); t.textContent=message; t.className=error?"error":"";
+  t.style.display="block"; clearTimeout(toast.timer);
+  toast.timer=setTimeout(()=>t.style.display="none",4000);
+}
+function setBusy(id,on,text) {
+  const b=$(id); if(!b)return;
+  b.disabled=on;
+  if(on){b.dataset.old=b.textContent;b.textContent="Chargement…"}
+  else if(b.dataset.old){b.textContent=b.dataset.old;delete b.dataset.old}
+}
+function showPage(page) {
+  document.querySelectorAll('[id^="page-"]').forEach(el=>el.classList.add("hidden"));
+  $("page-"+page).classList.remove("hidden");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  $("crumb").textContent=({dashboard:"Vue générale",employees:"Personnel",vehicles:"Véhicules",documents:"Documents médicaux",grades:"Hiérarchie",settings:"Paramètres"})[page]||page;
+}
+window.showPage=showPage;
+
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
+
+$("loginBtn").addEventListener("click",async()=>{
+  $("loginMessage").textContent="Redirection vers Discord…";
+  const {error}=await sb.auth.signInWithOAuth({
+    provider:"discord",
+    options:{redirectTo:"https://nael-amr.github.io/Panel-L.S.M.C/"}
   });
+  if(error)$("loginMessage").textContent="Erreur : "+error.message;
+});
+$("logoutBtn").addEventListener("click",logout);
+$("settingsLogout").addEventListener("click",logout);
+async function logout(){await sb.auth.signOut();location.reload()}
 
-  document.getElementById("discordLogin").addEventListener("click", async () => {
-    const { error } = await sb.auth.signInWithOAuth({
-      provider: "discord",
-      options: {
-        redirectTo: "https://nael-amr.github.io/Panel-L.S.M.C/"
-      }
-    });
-    if (error) alert("Erreur de connexion : " + error.message);
-  });
-
-  async function checkSession() {
-    const { data, error } = await sb.auth.getSession();
-    if (error) {
-      document.getElementById("loginStatus").textContent = "Erreur de session";
-      return;
-    }
-    if (!data.session) return;
-
-    document.getElementById("loginStatus").textContent =
-      "Connecté à Discord — vérification du rôle…";
-
-    const { data: result, error: roleError } = await sb.functions.invoke(
-      "check-discord-role",
-      { body: {} }
-    );
-
-    if (roleError || !result?.allowed) {
-      document.getElementById("loginStatus").textContent =
-        "Accès refusé : rôle Discord requis.";
-      await sb.auth.signOut();
-      alert("Accès refusé. Vérifie que tu possèdes le rôle Discord Accès Panel.");
-      return;
-    }
-
-    document.getElementById("loginStatus").textContent = "Accès autorisé";
+async function checkAccess(session) {
+  if(!session) {
+    sessionUser=null;$("app").style.display="none";$("loginScreen").style.display="grid";return;
   }
-
-  document.getElementById("employeeForm").addEventListener("submit", event => {
-    event.preventDefault();
-    const name = document.getElementById("employeeName").value.trim();
-    const grade = document.getElementById("employeeGrade").value;
-    if (!name) return;
-    employeeList.push({ name, grade });
-    renderEmployees();
-    event.target.reset();
-  });
-
-  function renderEmployees() {
-    const rows = document.getElementById("employeeRows");
-    rows.replaceChildren();
-    employeeList.forEach((employee, index) => {
-      const row = rows.insertRow();
-      row.insertCell().textContent = employee.name;
-      row.insertCell().textContent = employee.grade;
-      const cell = row.insertCell();
-      const button = document.createElement("button");
-      button.className = "primary";
-      button.textContent = "Supprimer";
-      button.onclick = () => {
-        employeeList.splice(index, 1);
-        renderEmployees();
-      };
-      cell.appendChild(button);
-    });
-    document.getElementById("employeeCount").textContent = employeeList.length;
+  $("loginMessage").textContent="Vérification du rôle Discord…";
+  const {data,error}=await sb.functions.invoke("check-discord-role",{body:{}});
+  if(error||!data?.allowed) {
+    $("app").style.display="none";$("loginScreen").style.display="grid";
+    $("loginMessage").textContent="Accès refusé. Vérifie le rôle Accès Panel puis reconnecte-toi.";
+    return;
   }
+  sessionUser=session.user;
+  $("loginScreen").style.display="none";$("app").style.display="block";
+  $("sessionInfo").textContent="Compte connecté : "+(session.user.email||session.user.id);
+  await loadAll();
+}
+sb.auth.onAuthStateChange((event,session)=>{
+  if(event==="SIGNED_OUT"){ $("app").style.display="none";$("loginScreen").style.display="grid"; }
+});
+(async()=>{
+  applyTheme();
+  const {data,error}=await sb.auth.getSession();
+  if(error){$("loginMessage").textContent="Impossible de lire la session. Actualise la page.";return}
+  await checkAccess(data.session);
+})();
 
-  document.getElementById("vehicleForm").addEventListener("submit", event => {
-    event.preventDefault();
-    const vehicle = {
-      type: document.getElementById("vehicleType").value,
-      name: document.getElementById("vehicleName").value.trim(),
-      plate: document.getElementById("vehiclePlate").value.trim()
+async function loadAll() {
+  try {
+    const results=await Promise.all([
+      sb.from("grades").select("*").order("level",{ascending:false}),
+      sb.from("employees").select("*").order("last_name"),
+      sb.from("vehicles").select("*").order("vehicle_model"),
+      sb.from("medical_documents").select("*").order("created_at",{ascending:false})
+    ]);
+    for(const r of results)if(r.error)throw r.error;
+    grades=results[0].data||[];
+    if(!grades.length)grades=gradeDefaults.map((g,i)=>({...g,id:`fallback-${i}`}));
+    employees=results[1].data||[];
+    vehicles=results[2].data||[];
+    documents=results[3].data||[];
+    await addEmployeePhotoUrls();
+    refreshForms();
+    renderEmployees();renderVehicles();renderDocuments();renderGrades();renderDashboard();
+  } catch(error) {
+    toast("Chargement impossible : "+error.message,true);
+  }
+}
+async function addEmployeePhotoUrls(){
+  await Promise.all(employees.map(async e=>{
+    e.photoUrl="";
+    if(e.photo_path){
+      const {data}=await sb.storage.from("employee-photos").createSignedUrl(e.photo_path,3600);
+      if(data)e.photoUrl=data.signedUrl;
+    }
+  }));
+}
+function refreshForms(){
+  const options=grades.map(g=>`<option value="${esc(g.id)}">${esc(g.name)}</option>`).join("");
+  $("employeeGrade").innerHTML=options;
+  $("gradeFilter").innerHTML='<option value="">Tous les grades</option>'+options;
+  const owners='<option value="">Non attribué</option>'+employees.map(e=>`<option value="${e.id}">${esc(e.first_name+" "+e.last_name)}</option>`).join("");
+  $("vehicleOwner").innerHTML=owners;
+  $("documentEmployee").innerHTML=owners;
+}
+function renderDashboard(){
+  $("statEmployees").textContent=employees.length;
+  $("statVehicles").textContent=vehicles.length;
+  $("statDocuments").textContent=documents.length;
+  $("statGrades").textContent=grades.length;
+}
+
+$("employeeForm").addEventListener("submit",async event=>{
+  event.preventDefault();if(busy)return;busy=true;setBusy("employeeSave",true);
+  try{
+    const photo=$("employeePhoto").files[0];
+    if(photo && (!photo.type.startsWith("image/")||photo.size>5*1024*1024))throw Error("Choisis une image de 5 Mo maximum.");
+    let photoPath=editingEmployee?.photo_path||null;
+    if(photo){
+      photoPath=`${sessionUser.id}/${crypto.randomUUID()}-${photo.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
+      const {error}=await sb.storage.from("employee-photos").upload(photoPath,photo,{upsert:false});
+      if(error)throw error;
+    }
+    const payload={
+      first_name:$("firstName").value.trim(),
+      last_name:$("lastName").value.trim(),
+      grade_id:Number($("employeeGrade").value),
+      birth_date:$("birthDate").value||null,
+      in_game_id:$("gameId").value.trim()||null,
+      recruited_at:$("recruitedAt").value||null,
+      status:$("employeeStatus").value,
+      photo_path:photoPath
     };
-    if (!vehicle.name) return;
-    vehicleList.push(vehicle);
-    renderVehicles();
-    event.target.reset();
-  });
+    if(editingEmployee){
+      const {error}=await sb.from("employees").update(payload).eq("id",editingEmployee.id);
+      if(error)throw error;
+      toast("Profil employé modifié.");
+    }else{
+      const {error}=await sb.from("employees").insert(payload);
+      if(error)throw error;
+      toast("Employé ajouté.");
+    }
+    resetEmployeeForm();await loadAll();
+  }catch(error){toast("Erreur : "+error.message,true)}
+  finally{busy=false;setBusy("employeeSave",false)}
+});
+function resetEmployeeForm(){
+  editingEmployee=null;$("employeeForm").reset();$("employeeFormTitle").textContent="Nouveau membre";
+  $("employeeSave").textContent="＋ Enregistrer le membre";$("employeeCancel").classList.add("hidden");
+}
+$("employeeCancel").addEventListener("click",resetEmployeeForm);
 
-  function renderVehicles() {
-    const rows = document.getElementById("vehicleRows");
-    rows.replaceChildren();
-    vehicleList.forEach((vehicle, index) => {
-      const row = rows.insertRow();
-      row.insertCell().textContent = vehicle.type;
-      row.insertCell().textContent = vehicle.name;
-      row.insertCell().textContent = vehicle.plate || "—";
-      const cell = row.insertCell();
-      const button = document.createElement("button");
-      button.className = "primary";
-      button.textContent = "Supprimer";
-      button.onclick = () => {
-        vehicleList.splice(index, 1);
-        renderVehicles();
-      };
-      cell.appendChild(button);
+function renderEmployees(){
+  const query=$("employeeSearch").value.toLowerCase();
+  const filter=$("gradeFilter").value;
+  const list=employees.filter(e=>
+    (!filter||String(e.grade_id)===filter)&&
+    `${e.first_name} ${e.last_name} ${e.in_game_id||""} ${gradeName(e.grade_id)}`.toLowerCase().includes(query)
+  );
+  $("employeeSummary").textContent=`${list.length} membre(s) affiché(s) · ${employees.length} au total`;
+  if(!list.length){$("employeeCards").innerHTML='<div class="empty" style="grid-column:1/-1"><span>♙</span>Aucun membre trouvé. Ajoute ton premier profil ci-dessus.</div>';return}
+  $("employeeCards").innerHTML=list.map(e=>`
+    <article class="panel employee-card">
+      <div class="employee-cover"></div>
+      <div class="employee-body">
+        ${e.photoUrl?`<img class="employee-photo" src="${esc(e.photoUrl)}" alt="Photo de ${esc(e.first_name)}">`:`<div class="employee-photo">${esc(initials(e.first_name,e.last_name))}</div>`}
+        <div class="employee-info"><div><h3>${esc(e.first_name)} ${esc(e.last_name)}</h3><div class="muted small">${esc(gradeName(e.grade_id))}</div></div><span class="status ${e.status==="Actif"?"":"inactive"}">${esc(e.status||"Actif")}</span></div>
+        <div class="employee-meta">⌁ ID en jeu : ${esc(e.in_game_id||"—")}<br>▦ Naissance : ${dateText(e.birth_date)}<br>＋ Recrutement : ${dateText(e.recruited_at)}</div>
+        <div class="card-actions"><button class="btn small-btn" data-edit-employee="${e.id}">Modifier</button><button class="btn danger small-btn" data-delete-employee="${e.id}">Supprimer</button></div>
+      </div>
+    </article>`).join("");
+  document.querySelectorAll("[data-edit-employee]").forEach(b=>b.onclick=()=>editEmployee(b.dataset.editEmployee));
+  document.querySelectorAll("[data-delete-employee]").forEach(b=>b.onclick=()=>deleteEmployee(b.dataset.deleteEmployee));
+}
+$("employeeSearch").addEventListener("input",renderEmployees);
+$("gradeFilter").addEventListener("change",renderEmployees);
+
+function editEmployee(id){
+  const e=employees.find(x=>String(x.id)===String(id));if(!e)return;
+  editingEmployee=e;
+  $("firstName").value=e.first_name||"";$("lastName").value=e.last_name||"";
+  $("employeeGrade").value=e.grade_id;$("birthDate").value=e.birth_date||"";
+  $("gameId").value=e.in_game_id||"";$("recruitedAt").value=e.recruited_at||"";
+  $("employeeStatus").value=e.status||"Actif";$("employeePhoto").value="";
+  $("employeeFormTitle").textContent="Modifier le profil";
+  $("employeeSave").textContent="Enregistrer les modifications";$("employeeCancel").classList.remove("hidden");
+  $("employeeForm").scrollIntoView({behavior:"smooth",block:"start"});
+}
+async function deleteEmployee(id){
+  if(!confirm("Supprimer ce profil employé ?"))return;
+  const e=employees.find(x=>String(x.id)===String(id));
+  const {error}=await sb.from("employees").delete().eq("id",id);
+  if(error){toast("Suppression impossible : "+error.message,true);return}
+  if(e?.photo_path)await sb.storage.from("employee-photos").remove([e.photo_path]);
+  toast("Profil supprimé.");await loadAll();
+}
+
+$("vehicleForm").addEventListener("submit",async event=>{
+  event.preventDefault();if(busy)return;busy=true;setBusy("vehicleSave",true);
+  try{
+    const payload={
+      vehicle_type:$("vehicleType").value,
+      vehicle_model:$("vehicleModel").value.trim(),
+      plate:$("vehiclePlate").value.trim()||null,
+      unit_number:$("unitNumber").value.trim()||null,
+      employee_id:$("vehicleOwner").value?Number($("vehicleOwner").value):null,
+      status:$("vehicleStatus").value
+    };
+    const result=editingVehicle
+      ?await sb.from("vehicles").update(payload).eq("id",editingVehicle.id)
+      :await sb.from("vehicles").insert(payload);
+    if(result.error)throw result.error;
+    toast(editingVehicle?"Véhicule modifié.":"Véhicule ajouté.");
+    resetVehicleForm();await loadAll();
+  }catch(error){toast("Erreur : "+error.message,true)}
+  finally{busy=false;setBusy("vehicleSave",false)}
+});
+function resetVehicleForm(){
+  editingVehicle=null;$("vehicleForm").reset();$("vehicleFormTitle").textContent="Ajouter un véhicule";
+  $("vehicleSave").textContent="＋ Enregistrer le véhicule";$("vehicleCancel").classList.add("hidden");
+}
+$("vehicleCancel").addEventListener("click",resetVehicleForm);
+
+function renderVehicles(){
+  const q=$("vehicleSearch").value.toLowerCase(),f=$("vehicleFilter").value;
+  const list=vehicles.filter(v=>(!f||v.vehicle_type===f)&&`${v.vehicle_model} ${v.plate||""} ${v.unit_number||""} ${v.vehicle_type||""} ${employeeName(v.employee_id)}`.toLowerCase().includes(q));
+  $("vehicleSummary").textContent=`${list.length} véhicule(s) affiché(s)`;
+  if(!list.length){$("vehicleRows").innerHTML='<tr><td colspan="6"><div class="empty">Aucun véhicule trouvé.</div></td></tr>';return}
+  $("vehicleRows").innerHTML=list.map(v=>`<tr>
+    <td><span class="vehicle-name"><span class="vehicle-symbol">▰</span><strong>${esc(v.vehicle_model)}</strong></span></td>
+    <td>${esc(v.vehicle_type||"Autre")}</td>
+    <td>${esc(v.plate||"—")}<br><span class="muted">${esc(v.unit_number||"")}</span></td>
+    <td>${esc(employeeName(v.employee_id))}</td><td><span class="status ${v.status==="Disponible"?"":"inactive"}">${esc(v.status||"Disponible")}</span></td>
+    <td><button class="btn small-btn" data-edit-vehicle="${v.id}">Modifier</button> <button class="btn danger small-btn" data-delete-vehicle="${v.id}">Supprimer</button></td>
+  </tr>`).join("");
+  document.querySelectorAll("[data-edit-vehicle]").forEach(b=>b.onclick=()=>editVehicle(b.dataset.editVehicle));
+  document.querySelectorAll("[data-delete-vehicle]").forEach(b=>b.onclick=()=>deleteVehicle(b.dataset.deleteVehicle));
+}
+$("vehicleSearch").addEventListener("input",renderVehicles);
+$("vehicleFilter").addEventListener("change",renderVehicles);
+
+function editVehicle(id){
+  const v=vehicles.find(x=>String(x.id)===String(id));if(!v)return;
+  editingVehicle=v;$("vehicleType").value=v.vehicle_type||"Autre";
+  $("vehicleModel").value=v.vehicle_model||"";$("vehiclePlate").value=v.plate||"";
+  $("unitNumber").value=v.unit_number||"";$("vehicleOwner").value=v.employee_id||"";
+  $("vehicleStatus").value=v.status||"Disponible";$("vehicleFormTitle").textContent="Modifier le véhicule";
+  $("vehicleSave").textContent="Enregistrer les modifications";$("vehicleCancel").classList.remove("hidden");
+  $("vehicleForm").scrollIntoView({behavior:"smooth",block:"start"});
+}
+async function deleteVehicle(id){
+  if(!confirm("Supprimer ce véhicule ?"))return;
+  const {error}=await sb.from("vehicles").delete().eq("id",id);
+  if(error){toast("Suppression impossible : "+error.message,true);return}
+  toast("Véhicule supprimé.");await loadAll();
+}
+
+$("documentForm").addEventListener("submit",async event=>{
+  event.preventDefault();if(busy)return;busy=true;setBusy("documentSave",true);
+  try{
+    const file=$("documentFile").files[0];if(!file)throw Error("Choisis un fichier.");
+    if(file.size>15*1024*1024)throw Error("Le fichier dépasse 15 Mo.");
+    const allowed=/\.(pdf|png|jpe?g|webp|docx?|xlsx?|txt)$/i;
+    if(!allowed.test(file.name))throw Error("Type de fichier non autorisé.");
+    const path=`${sessionUser.id}/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
+    const upload=await sb.storage.from("medical-documents").upload(path,file,{upsert:false});
+    if(upload.error)throw upload.error;
+    const {error}=await sb.from("medical_documents").insert({
+      title:$("documentTitle").value.trim(),
+      category:$("documentCategory").value,
+      employee_id:$("documentEmployee").value?Number($("documentEmployee").value):null,
+      storage_path:path,uploaded_by:sessionUser.id
     });
-    document.getElementById("vehicleCount").textContent = vehicleList.length;
-  }
+    if(error){await sb.storage.from("medical-documents").remove([path]);throw error}
+    $("documentForm").reset();toast("Document déposé dans le stockage privé.");await loadAll();
+  }catch(error){toast("Erreur : "+error.message,true)}
+  finally{busy=false;setBusy("documentSave",false)}
+});
 
-  checkSession();
+async function renderDocuments(){
+  const q=$("documentSearch").value.toLowerCase(),f=$("documentFilter").value;
+  const list=documents.filter(d=>(!f||d.category===f)&&`${d.title} ${d.category} ${employeeName(d.employee_id)}`.toLowerCase().includes(q));
+  $("documentSummary").textContent=`${list.length} document(s)`;
+  if(!list.length){$("documentList").innerHTML='<div class="empty"><span>▤</span>Aucun document trouvé. Dépose ton premier fichier ci-dessus.</div>';return}
+  $("documentList").innerHTML=list.map(d=>`<div class="doc-row">
+    <div class="doc-icon">${/pdf/i.test(d.storage_path)?"▤":"▧"}</div>
+    <div class="doc-info"><strong>${esc(d.title)}</strong><small>${esc(d.category)} · ${esc(employeeName(d.employee_id))} · ${new Date(d.created_at).toLocaleDateString("fr-FR")}</small></div>
+    <button class="btn small-btn" data-open-document="${d.id}">Ouvrir ↗</button>
+    <button class="btn danger small-btn" data-delete-document="${d.id}">Supprimer</button>
+  </div>`).join("");
+  document.querySelectorAll("[data-open-document]").forEach(b=>b.onclick=()=>openDocument(b.dataset.openDocument));
+  document.querySelectorAll("[data-delete-document]").forEach(b=>b.onclick=()=>deleteDocument(b.dataset.deleteDocument));
+}
+$("documentSearch").addEventListener("input",renderDocuments);
+$("documentFilter").addEventListener("change",renderDocuments);
+
+async function openDocument(id){
+  const d=documents.find(x=>String(x.id)===String(id));if(!d)return;
+  const {data,error}=await sb.storage.from("medical-documents").createSignedUrl(d.storage_path,60);
+  if(error||!data?.signedUrl){toast("Impossible d'ouvrir le document.",true);return}
+  window.open(data.signedUrl,"_blank","noopener,noreferrer");
+}
+async function deleteDocument(id){
+  if(!confirm("Supprimer définitivement ce document ?"))return;
+  const d=documents.find(x=>String(x.id)===String(id));if(!d)return;
+  const {error}=await sb.from("medical_documents").delete().eq("id",id);
+  if(error){toast("Suppression impossible : "+error.message,true);return}
+  await sb.storage.from("medical-documents").remove([d.storage_path]);
+  toast("Document supprimé.");await loadAll();
+}
+
+function renderGrades(){
+  $("gradeList").innerHTML=grades.map((g,i)=>`<div class="activity"><div class="activity-icon">${i===0?"✦":"✳"}</div><div><p><strong>${esc(g.name)}</strong></p><small>Niveau ${esc(g.level)} · ${employees.filter(e=>String(e.grade_id)===String(g.id)).length} membre(s)</small></div><span class="pill" style="margin-left:auto">#${String(i+1).padStart(2,"0")}</span></div>`).join("");
+}
+function applyTheme(){
+  const c=localStorage.getItem("lsmc-accent")||"#55a6ff";
+  document.documentElement.style.setProperty("--accent",c);
+  if($("accentColor"))$("accentColor").value=c;
+}
+$("saveTheme").addEventListener("click",()=>{
+  localStorage.setItem("lsmc-accent",$("accentColor").value);applyTheme();toast("Thème enregistré sur cet appareil.");
+});
+$("resetTheme").addEventListener("click",()=>{
+  localStorage.removeItem("lsmc-accent");applyTheme();toast("Thème réinitialisé.");
+});
 </script>
 </body>
 </html>
