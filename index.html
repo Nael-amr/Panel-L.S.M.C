@@ -4,62 +4,254 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LSMC | Panel EMS</title>
+  <title>LSMC | Gestion EMS</title>
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
+      font-family: Arial, sans-serif;
       background: #0b1120;
       color: #edf3fc;
-      font-family: Arial, sans-serif;
     }
-    header {
-      background: #131d30;
-      padding: 24px;
-      border-bottom: 1px solid #26344a;
+    .layout { display: flex; min-height: 100vh; }
+    aside {
+      width: 230px;
+      padding: 25px 16px;
+      background: #111a2b;
+      border-right: 1px solid #26344a;
     }
-    header h1 { margin: 0; color: #60a5fa; }
-    main { padding: 30px; }
+    .brand { color: #60a5fa; font-size: 23px; font-weight: bold; margin-bottom: 8px; }
+    .subtitle { color: #91a2bb; font-size: 13px; margin-bottom: 32px; }
+    nav button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 13px;
+      margin: 6px 0;
+      color: #cbd5e1;
+      background: transparent;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    nav button:hover, nav button.active { background: #20304a; color: #fff; }
+    main { flex: 1; padding: 30px; min-width: 0; }
+    h1 { margin-top: 0; }
+    .muted { color: #91a2bb; }
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
       gap: 16px;
+      margin: 25px 0;
     }
-    .card {
+    .card, .panel {
       background: #131d30;
       border: 1px solid #26344a;
       border-radius: 12px;
-      padding: 22px;
+      padding: 20px;
     }
-    .number { font-size: 32px; margin-top: 12px; }
-    .muted { color: #91a2bb; }
+    .number { font-size: 30px; margin-top: 12px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
+    input, select {
+      background: #0b1120;
+      color: white;
+      border: 1px solid #35445c;
+      border-radius: 8px;
+      padding: 11px;
+      max-width: 100%;
+    }
+    .toolbar input { flex: 1; min-width: 160px; }
+    .primary {
+      background: #2563eb;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 15px;
+      cursor: pointer;
+    }
+    .primary:hover { background: #1d4ed8; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 480px; }
+    th, td { padding: 13px 10px; text-align: left; border-bottom: 1px solid #26344a; }
+    th { color: #91a2bb; font-size: 13px; }
+    .empty { padding: 25px 0; color: #91a2bb; }
+    .hidden { display: none; }
+    @media (max-width: 650px) {
+      .layout { display: block; }
+      aside { width: 100%; border-right: 0; border-bottom: 1px solid #26344a; }
+      nav { display: flex; flex-wrap: wrap; }
+      nav button { width: auto; }
+      main { padding: 20px 14px; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>LSMC — EMS</h1>
-    <p class="muted">Panel de gestion hospitalière</p>
-  </header>
+<div class="layout">
+  <aside>
+    <div class="brand">LSMC</div>
+    <div class="subtitle">Gestion hospitalière EMS</div>
+    <nav>
+      <button class="active" data-page="dashboard">▦ Tableau de bord</button>
+      <button data-page="employees">♙ Employés</button>
+      <button data-page="vehicles">▣ Véhicules</button>
+      <button data-page="grades">★ Grades</button>
+    </nav>
+  </aside>
+
   <main>
-    <h2>Tableau de bord</h2>
-    <p class="muted">Bienvenue sur le panel de ton hôpital.</p>
-    <div class="cards">
-      <div class="card">
-        <div class="muted">Employés</div>
-        <div class="number">0</div>
+    <section id="dashboard">
+      <h1>Tableau de bord</h1>
+      <p class="muted">Bienvenue dans le panel de gestion du L.S.M.C.</p>
+      <div class="cards">
+        <div class="card"><div class="muted">Employés enregistrés</div><div class="number" id="employeeCount">0</div></div>
+        <div class="card"><div class="muted">Véhicules enregistrés</div><div class="number" id="vehicleCount">0</div></div>
+        <div class="card"><div class="muted">Grades configurés</div><div class="number" id="gradeCount">5</div></div>
       </div>
-      <div class="card">
-        <div class="muted">Véhicules</div>
-        <div class="number">0</div>
+      <div class="panel">
+        <h3>Bienvenue au L.S.M.C.</h3>
+        <p class="muted">Utilise le menu pour gérer les employés et les véhicules.</p>
       </div>
-      <div class="card">
-        <div class="muted">Grades</div>
-        <div class="number">0</div>
+    </section>
+
+    <section id="employees" class="hidden">
+      <h1>Gestion des employés</h1>
+      <p class="muted">Ajoute et consulte les membres du personnel.</p>
+      <form id="employeeForm" class="toolbar">
+        <input id="employeeName" placeholder="Nom du membre" required maxlength="80">
+        <select id="employeeGrade">
+          <option>Recrue</option><option>Ambulancier</option>
+          <option>Médecin</option><option>Chef de service</option>
+          <option>Directeur</option>
+        </select>
+        <button class="primary" type="submit">+ Ajouter</button>
+      </form>
+      <div class="panel table-wrap">
+        <table>
+          <thead><tr><th>Nom</th><th>Grade</th><th>Action</th></tr></thead>
+          <tbody id="employeeRows"></tbody>
+        </table>
+        <p id="employeeEmpty" class="empty">Aucun employé pour le moment.</p>
       </div>
-      <div class="card">
-        <div class="muted">En service</div>
-        <div class="number">0</div>
+    </section>
+
+    <section id="vehicles" class="hidden">
+      <h1>Gestion des véhicules</h1>
+      <p class="muted">Ajoute les véhicules du service.</p>
+      <form id="vehicleForm" class="toolbar">
+        <input id="vehicleName" placeholder="Nom du véhicule" required maxlength="80">
+        <input id="vehiclePlate" placeholder="Plaque (facultatif)" maxlength="20">
+        <button class="primary" type="submit">+ Ajouter</button>
+      </form>
+      <div class="panel table-wrap">
+        <table>
+          <thead><tr><th>Véhicule</th><th>Plaque</th><th>Action</th></tr></thead>
+          <tbody id="vehicleRows"></tbody>
+        </table>
+        <p id="vehicleEmpty" class="empty">Aucun véhicule pour le moment.</p>
       </div>
-    </div>
+    </section>
+
+    <section id="grades" class="hidden">
+      <h1>Grades du L.S.M.C.</h1>
+      <p class="muted">Liste de départ, personnalisable plus tard.</p>
+      <div class="panel">
+        <ol>
+          <li>Recrue</li>
+          <li>Ambulancier</li>
+          <li>Médecin</li>
+          <li>Chef de service</li>
+          <li>Directeur</li>
+        </ol>
+      </div>
+    </section>
   </main>
+</div>
+
+<script>
+  const employeeList = [];
+  const vehicleList = [];
+
+  document.querySelectorAll("nav button").forEach(button => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll("main section").forEach(section => section.classList.add("hidden"));
+      document.getElementById(button.dataset.page).classList.remove("hidden");
+      document.querySelectorAll("nav button").forEach(item => item.classList.remove("active"));
+      button.classList.add("active");
+    });
+  });
+
+  function renderEmployees() {
+    const rows = document.getElementById("employeeRows");
+    rows.replaceChildren();
+    employeeList.forEach((employee, index) => {
+      const row = document.createElement("tr");
+      [employee.name, employee.grade].forEach(value => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
+      const actionCell = document.createElement("td");
+      const remove = document.createElement("button");
+      remove.className = "primary";
+      remove.textContent = "Supprimer";
+      remove.addEventListener("click", () => {
+        employeeList.splice(index, 1);
+        renderEmployees();
+      });
+      actionCell.appendChild(remove);
+      row.appendChild(actionCell);
+      rows.appendChild(row);
+    });
+    document.getElementById("employeeEmpty").classList.toggle("hidden", employeeList.length > 0);
+    document.getElementById("employeeCount").textContent = employeeList.length;
+  }
+
+  function renderVehicles() {
+    const rows = document.getElementById("vehicleRows");
+    rows.replaceChildren();
+    vehicleList.forEach((vehicle, index) => {
+      const row = document.createElement("tr");
+      [vehicle.name, vehicle.plate || "—"].forEach(value => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
+      const actionCell = document.createElement("td");
+      const remove = document.createElement("button");
+      remove.className = "primary";
+      remove.textContent = "Supprimer";
+      remove.addEventListener("click", () => {
+        vehicleList.splice(index, 1);
+        renderVehicles();
+      });
+      actionCell.appendChild(remove);
+      row.appendChild(actionCell);
+      rows.appendChild(row);
+    });
+    document.getElementById("vehicleEmpty").classList.toggle("hidden", vehicleList.length > 0);
+    document.getElementById("vehicleCount").textContent = vehicleList.length;
+  }
+
+  document.getElementById("employeeForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const name = document.getElementById("employeeName").value.trim();
+    const grade = document.getElementById("employeeGrade").value;
+    if (!name) return;
+    employeeList.push({ name, grade });
+    event.target.reset();
+    renderEmployees();
+  });
+
+  document.getElementById("vehicleForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const name = document.getElementById("vehicleName").value.trim();
+    const plate = document.getElementById("vehiclePlate").value.trim();
+    if (!name) return;
+    vehicleList.push({ name, plate });
+    event.target.reset();
+    renderVehicles();
+  });
+</script>
 </body>
 </html>
