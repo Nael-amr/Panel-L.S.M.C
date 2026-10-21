@@ -97,6 +97,7 @@
       <button data-page="vehicles">▣ Véhicules</button>
       <button data-page="grades">★ Grades</button>
     </nav>
+      <button id="discordLogin">Connexion avec Discord</button>
   </aside>
 
   <main>
@@ -252,6 +253,21 @@
     event.target.reset();
     renderVehicles();
   });
+  const SUPABASE_URL = "https://ehtnwlgmpftsphzqmzia.supabase.co";
+const SUPABASE_KEY = "sb_publishable_6N5_91bX7PfPEljP3Y_7HQ_XZ6ah-1w";
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+document.getElementById("discordLogin").addEventListener("click", async () => {
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: "discord",
+    options: {
+      redirectTo: "https://nael-amr.github.io/Panel-L.S.M.C/"
+    }
+  });
+
+  if (error) alert("Erreur de connexion : " + error.message);
+});
 </script>
 </body>
 </html>
