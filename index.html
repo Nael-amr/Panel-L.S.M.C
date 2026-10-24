@@ -362,6 +362,7 @@ async function checkAccess(session) {
     return;
   }
   sessionUser=session.user;
+  console.log("Mon ID Supabase :", session.user.id);
   $("loginScreen").style.display="none";$("app").style.display="block";
   $("sessionInfo").textContent="Compte connecté : "+(session.user.email||session.user.id);
   await loadAll();
