@@ -364,7 +364,7 @@ async function checkAccess(session) {
   sessionUser=session.user;
   console.log("Mon ID Supabase :", session.user.id);
   $("loginScreen").style.display="none";$("app").style.display="block";
-  $("sessionInfo").textContent="Compte connecté : "+(session.user.email||session.user.id)+" | ID Supabase : "+session.user.id;
+  $("sessionInfo").textContent="Compte connecté : "+(session.user.email||"Discord")+" | ID Supabase : "+session.user.id;
   await loadAll();
 }
 sb.auth.onAuthStateChange((event,session)=>{
