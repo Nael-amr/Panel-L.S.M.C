@@ -506,7 +506,9 @@ function editEmployee(id){
   editingEmployee=e;
   $("firstName").value=e.first_name||"";$("lastName").value=e.last_name||"";
   $("employeeGrade").value=e.grade_id;$("birthDate").value=e.birth_date||"";
-  $("gameId").value=e.in_game_id||"";$("recruitedAt").value=e.recruited_at||"";
+  $("gameId").value=e.in_game_id||"";
+$("discordId").value=e.discord_id||"";
+$("recruitedAt").value=e.recruited_at||"";
   $("employeeStatus").value=e.status||"Actif";$("employeePhoto").value="";
   $("employeeFormTitle").textContent="Modifier le profil";
   $("employeeSave").textContent="Enregistrer les modifications";$("employeeCancel").classList.remove("hidden");
