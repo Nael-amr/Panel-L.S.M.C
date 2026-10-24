@@ -215,7 +215,15 @@ tbody tr:hover{background:#ffffff04}
               <div class="field"><label>Nom *</label><input id="lastName" required maxlength="80" placeholder="Nom"></div>
               <div class="field"><label>Grade *</label><select id="employeeGrade" required></select></div>
               <div class="field"><label>Date de naissance</label><input id="birthDate" type="date"></div>
-              <div class="field"><label>ID en jeu</label><input id="gameId" maxlength="100" placeholder="ID / identifiant RP"></div>
+              <div class="field">
+  <label>ID en jeu</label>
+  <input id="gameId" maxlength="100" placeholder="ID / identifiant RP">
+</div>
+<div class="field">
+  <label>ID Discord du membre *</label>
+  <input id="discordId" required maxlength="20" inputmode="numeric"
+         pattern="[0-9]{17,20}" placeholder="Ex. : 123456789012345678">
+</div>
               <div class="field"><label>Date de recrutement</label><input id="recruitedAt" type="date"></div>
               <div class="field"><label>Statut</label><select id="employeeStatus"><option value="Actif">Actif</option><option value="Inactif">Inactif</option><option value="En formation">En formation</option></select></div>
               <div class="field"><label>Photo du membre</label><input id="employeePhoto" type="file" accept="image/jpeg,image/png,image/webp"></div>
@@ -432,17 +440,20 @@ $("employeeForm").addEventListener("submit",async event=>{
       photoPath=`${sessionUser.id}/${crypto.randomUUID()}-${photo.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
       const {error}=await sb.storage.from("employee-photos").upload(photoPath,photo,{upsert:false});
       if(error)throw error;
-    }
-    const payload={
-      first_name:$("firstName").value.trim(),
-      last_name:$("lastName").value.trim(),
-      grade_id:Number($("employeeGrade").value),
-      birth_date:$("birthDate").value||null,
-      in_game_id:$("gameId").value.trim()||null,
-      recruited_at:$("recruitedAt").value||null,
-      status:$("employeeStatus").value,
-      photo_path:photoPath
-    };
+    
+}
+const payload={
+  first_name:$("firstName").value.trim(),
+  last_name:$("lastName").value.trim(),
+  grade_id:Number($("employeeGrade").value),
+  birth_date:$("birthDate").value||null,
+  in_game_id:$("gameId").value.trim()||null,
+  discord_id:$("discordId").value.trim()||null,
+  recruited_at:$("recruitedAt").value||null,
+  status:$("employeeStatus").value,
+  photo_path:photoPath
+};
+
     if(editingEmployee){
       const {error}=await sb.from("employees").update(payload).eq("id",editingEmployee.id);
       if(error)throw error;
