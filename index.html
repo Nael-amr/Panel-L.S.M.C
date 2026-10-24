@@ -448,8 +448,11 @@ $("employeeForm").addEventListener("submit",async event=>{
       if(error)throw error;
       toast("Profil employé modifié.");
     }else{
-      const {error}=await sb.from("employees").insert(payload);
-      if(error)throw error;
+const {error}=await sb.from("employees").insert(payload);
+if(error){
+  console.error("Erreur ajout employé :", error);
+  throw error;
+}
       toast("Employé ajouté.");
     }
     resetEmployeeForm();await loadAll();
