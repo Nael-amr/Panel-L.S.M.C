@@ -491,7 +491,12 @@ function renderEmployees(){
       <div class="employee-body">
         ${e.photoUrl?`<img class="employee-photo" src="${esc(e.photoUrl)}" alt="Photo de ${esc(e.first_name)}">`:`<div class="employee-photo">${esc(initials(e.first_name,e.last_name))}</div>`}
         <div class="employee-info"><div><h3>${esc(e.first_name)} ${esc(e.last_name)}</h3><div class="muted small">${esc(gradeName(e.grade_id))}</div></div><span class="status ${e.status==="Actif"?"":"inactive"}">${esc(e.status||"Actif")}</span></div>
-        <div class="employee-meta">⌁ ID en jeu : ${esc(e.in_game_id||"—")}<br>▦ Naissance : ${dateText(e.birth_date)}<br>＋ Recrutement : ${dateText(e.recruited_at)}</div>
+        <div class="employee-meta">
+  ⌁ ID en jeu : ${esc(e.in_game_id||"—")}<br>
+  Discord : ${esc(e.discord_id||"—")}<br>
+  ▦ Naissance : ${dateText(e.birth_date)}<br>
+  ＋ Recrutement : ${dateText(e.recruited_at)}
+</div>
         <div class="card-actions"><button class="btn small-btn" data-edit-employee="${e.id}">Modifier</button><button class="btn danger small-btn" data-delete-employee="${e.id}">Supprimer</button></div>
       </div>
     </article>`).join("");
