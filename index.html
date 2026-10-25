@@ -93,7 +93,9 @@ p{line-height:1.6}
 .employee-info h3{font-size:15px;margin:0 0 5px}
 .employee-meta{color:var(--muted);font-size:11px;line-height:1.8;margin:12px 0}
 .status{display:inline-flex;align-items:center;border-radius:100px;padding:5px 8px;font-size:10px;font-weight:800;background:#173c34;color:#74e3bd}
-.status.inactive{background:#3b2c22;color:#ffc58c}
+.status.inactive{background:#491b22;color:#ff8c96}
+.status.assigned{background:#173c34;color:#74e3bd}
+.status.unassigned{background:#491b22;color:#ff8c96}
 .card-actions{display:flex;gap:7px;flex-wrap:wrap}
 .table-wrap{overflow-x:auto}
 table{border-collapse:collapse;width:100%;white-space:nowrap}
@@ -563,7 +565,7 @@ function renderVehicles(){
     <td><span class="vehicle-name"><span class="vehicle-symbol">▰</span><strong>${esc(v.vehicle_model)}</strong></span></td>
     <td>${esc(v.vehicle_type||"Autre")}</td>
     <td>${esc(v.plate||"—")}<br><span class="muted">${esc(v.unit_number||"")}</span></td>
-    <td>${esc(employeeName(v.employee_id))}</td><td><span class="status ${v.status==="Disponible"?"":"inactive"}">${esc(v.status||"Disponible")}</span></td>
+    <td>${esc(employeeName(v.employee_id))}</td><td><span class="status ${v.status==="Attribué"?"assigned":"unassigned"}">${esc(v.status||"Non Attribué")}</span></td>
     <td><button class="btn small-btn" data-edit-vehicle="${v.id}">Modifier</button> <button class="btn danger small-btn" data-delete-vehicle="${v.id}">Supprimer</button></td>
   </tr>`).join("");
   document.querySelectorAll("[data-edit-vehicle]").forEach(b=>b.onclick=()=>editVehicle(b.dataset.editVehicle));
@@ -577,7 +579,7 @@ function editVehicle(id){
   editingVehicle=v;$("vehicleType").value=v.vehicle_type||"Autre";
   $("vehicleModel").value=v.vehicle_model||"";$("vehiclePlate").value=v.plate||"";
   $("unitNumber").value=v.unit_number||"";$("vehicleOwner").value=v.employee_id||"";
-  $("vehicleStatus").value=v.status||"Disponible";$("vehicleFormTitle").textContent="Modifier le véhicule";
+  $("vehicleStatus").value=v.status||"Non Attribué";$("vehicleFormTitle").textContent="Modifier le véhicule";
   $("vehicleSave").textContent="Enregistrer les modifications";$("vehicleCancel").classList.remove("hidden");
   $("vehicleForm").scrollIntoView({behavior:"smooth",block:"start"});
 }
