@@ -866,6 +866,7 @@ $("resetTheme").addEventListener("click",()=>{
   if (error || !data) {
     statusElement.textContent = "Statut indisponible";
     lastSeenElement.textContent = error ? error.message : "";
+    console.error("Erreur bot_status :", error);
     return;
   }
 
