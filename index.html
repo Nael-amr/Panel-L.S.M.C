@@ -482,7 +482,8 @@ async function loadAll() {
       sb.from("grades").select("*").order("level",{ascending:false}),
       sb.from("employees").select("*").order("last_name"),
       sb.from("vehicles").select("*").order("vehicle_model"),
-      sb.from("medical_documents").select("*").order("created_at",{ascending:false})
+      sb.from("medical_documents").select("*").order("created_at",{ascending:false}),
+sb.from("service_sessions").select("*")
     ]);
     for(const r of results)if(r.error)throw r.error;
     grades=results[0].data||[];
