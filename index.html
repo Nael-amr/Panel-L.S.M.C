@@ -650,7 +650,12 @@ function getEmployeeServiceInfo(employee) {
                 ${esc(e.status || "Actif")}
               </span>
             </td>
-            <td><span class="presence">Non synchronisé</span></td>
+            <td>
+  ${(() => {
+    const info = getEmployeeServiceInfo(e);
+    return `<span class="presence">${info.onDuty ? "🟢 En service" : "⚪ Hors service"}</span>`;
+  })()}
+</td>
             <td>—</td>
             <td>
               <div class="card-actions">
