@@ -465,9 +465,6 @@ async function checkAccess(session) {
   $("loginScreen").style.display="none";$("app").style.display="block";
   $("sessionInfo").textContent="Compte connecté : "+(session.user.email||"Discord")+" | ID Supabase : "+session.user.id;
   await loadAll();
-  setInterval(async () => {
-  await loadAll();
-}, 10000);
 }
 sb.auth.onAuthStateChange((event,session)=>{
   if(event==="SIGNED_OUT"){ $("app").style.display="none";$("loginScreen").style.display="grid"; }
