@@ -865,12 +865,19 @@ $("resetTheme").addEventListener("click",()=>{
 
 console.log("Résultat bot_status :", { data, error });
 
-  if (error || !data) {
-    statusElement.textContent = "Statut indisponible";
-    lastSeenElement.textContent = error ? error.message : "";
-    console.error("Erreur bot_status :", error);
-    return;
-  }
+  if (error) {
+  statusElement.textContent = "Erreur Supabase";
+  lastSeenElement.textContent = error.message;
+  console.error("Erreur bot_status :", error);
+  return;
+}
+
+if (!data) {
+  statusElement.textContent = "Ligne bot introuvable";
+  lastSeenElement.textContent = "Aucune ligne lsmc reçue";
+  console.log("Aucune ligne bot_status trouvée");
+  return;
+}
 
   const lastSeen = data.last_seen ? new Date(data.last_seen) : null;
   const isOnline = data.connected &&
