@@ -656,7 +656,7 @@ function getEmployeeServiceInfo(employee) {
     return `<span class="presence">${info.onDuty ? "🟢 En service" : "⚪ Hors service"}</span>`;
   })()}
 </td>
-            <td>—</td>
+            <td>${formatServiceTime(getEmployeeServiceInfo(e).totalMs)}</td>
             <td>
               <div class="card-actions">
                 <button class="btn small-btn" data-edit-employee="${e.id}">Modifier</button>
