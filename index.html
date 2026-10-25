@@ -858,10 +858,12 @@ $("resetTheme").addEventListener("click",()=>{
   const lastSeenElement = document.getElementById("botLastSeen");
 
   const { data, error } = await sb
-    .from("bot_status")
-    .select("connected, last_seen")
-    .eq("id", "lsmc")
-    .maybeSingle();
+  .from("bot_status")
+  .select("id, connected, last_seen")
+  .eq("id", "lsmc")
+  .maybeSingle();
+
+console.log("Résultat bot_status :", { data, error });
 
   if (error || !data) {
     statusElement.textContent = "Statut indisponible";
