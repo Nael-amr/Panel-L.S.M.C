@@ -668,8 +668,9 @@ function getEmployeeServiceInfo(employee) {
       }).join("")
     : `<tr><td colspan="6" class="empty">Aucun membre trouvé.</td></tr>`;
 
-  $("onDutyCount").textContent = "—";
-  $("offDutyCount").textContent = "—";
+  const onDuty = employees.filter(e => getEmployeeServiceInfo(e).onDuty).length;
+$("onDutyCount").textContent = onDuty;
+$("offDutyCount").textContent = employees.length - onDuty;
 
   document.querySelectorAll("[data-edit-employee]").forEach(button => {
     button.onclick = () => editEmployee(button.dataset.editEmployee);
