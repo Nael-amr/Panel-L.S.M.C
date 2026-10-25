@@ -688,7 +688,19 @@ $("offDutyCount").textContent = employees.length - onDuty;
 }
 $("employeeSearch").addEventListener("input",renderEmployees);
 $("gradeFilter").addEventListener("change",renderEmployees);
+setInterval(async () => {
+  const { data, error } = await sb
+    .from("service_sessions")
+    .select("*");
 
+  if (error) {
+    console.error("Erreur d'actualisation du service :", error.message);
+    return;
+  }
+
+  serviceSessions = data || [];
+  renderEmployees();
+}, 10000);
 function editEmployee(id){
   const e=employees.find(x=>String(x.id)===String(id));if(!e)return;
   editingEmployee=e;
