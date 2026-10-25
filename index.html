@@ -603,6 +603,26 @@ function renderEmployees() {
   $("employeeSummary").textContent =
     `${list.length} membre(s) affiché(s) · ${employees.length} au total`;
 
+  const now = Date.now();
+
+function getEmployeeServiceInfo(employee) {
+  const sessions = serviceSessions.filter(
+    s => String(s.employee_id) === String(employee.id)
+  );
+
+  const activeSession = sessions.find(s => !s.ended_at);
+
+  const totalMs = sessions.reduce((total, s) => {
+    const start = new Date(s.started_at).getTime();
+    const end = s.ended_at ? new Date(s.ended_at).getTime() : now;
+    return total + Math.max(0, end - start);
+  }, 0);
+
+  return {
+    onDuty: Boolean(activeSession),
+    totalMs
+  };
+}
   $("employeeRows").innerHTML = list.length
     ? list.map(e => {
         const color = gradeColor(e.grade_id);
