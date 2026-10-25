@@ -583,7 +583,12 @@ function gradeColor(id) {
   const index = grades.findIndex(g => String(g.id) === String(id));
   return gradePalette[index >= 0 ? index % gradePalette.length : 7];
 }
-window.formatServiceTime = function(ms) {
+function formatServiceTime(ms) {
+  const totalMinutes = Math.floor(ms / 60000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${hours} h ${minutes} min`;
+}
   const totalMinutes = Math.floor(ms / 60000);
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
