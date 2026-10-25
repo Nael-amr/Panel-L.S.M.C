@@ -319,10 +319,11 @@ tbody tr:hover{background:#ffffff04}
       </div>
 
       <div class="panel">
-        <h3>Intégration Discord</h3>
-        <p class="muted small">Le bot permettra de synchroniser les présences et les heures de service.</p>
-        <div class="integration-note">Bot non connecté</div>
-      </div>
+  <h3>Intégration Discord</h3>
+  <p class="muted small">État du bot Discord et synchronisation des services.</p>
+  <div class="integration-note" id="botStatus">Vérification du bot…</div>
+  <p class="muted small" id="botLastSeen"></p>
+</div>
     </div>
   </div>
 </div>
@@ -852,6 +853,38 @@ $("saveTheme").addEventListener("click",()=>{
 $("resetTheme").addEventListener("click",()=>{
   localStorage.removeItem("lsmc-accent");applyTheme();toast("Thème réinitialisé.");
 });
+  async function refreshBotStatus() {
+  const statusElement = document.getElementById("botStatus");
+  const lastSeenElement = document.getElementById("botLastSeen");
+
+  const { data, error } = await sb
+    .from("bot_status")
+    .select("connected, last_seen")
+    .eq("id", "lsmc")
+    .maybeSingle();
+
+  if (error || !data) {
+    statusElement.textContent = "Statut indisponible";
+    lastSeenElement.textContent = error ? error.message : "";
+    return;
+  }
+
+  const lastSeen = data.last_seen ? new Date(data.last_seen) : null;
+  const isOnline = data.connected &&
+    lastSeen &&
+    (Date.now() - lastSeen.getTime() < 60000);
+
+  statusElement.textContent = isOnline
+    ? "🟢 Bot connecté"
+    : "🔴 Bot déconnecté";
+
+  lastSeenElement.textContent = lastSeen
+    ? "Dernier signal : " + lastSeen.toLocaleString("fr-FR")
+    : "Aucun signal reçu";
+}
+
+refreshBotStatus();
+setInterval(refreshBotStatus, 15000);
 </script>
 </body>
 </html>
