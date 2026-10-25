@@ -698,8 +698,9 @@ setInterval(async () => {
     return;
   }
 
-  serviceSessions = data || [];
+    serviceSessions = data || [];
   renderEmployees();
+  renderDashboard();
 }, 10000);
 function editEmployee(id){
   const e=employees.find(x=>String(x.id)===String(id));if(!e)return;
