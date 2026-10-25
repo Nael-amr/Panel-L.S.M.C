@@ -45,7 +45,7 @@ h3{font-size:14px;margin:0 0 8px}
 p{line-height:1.6}
 .muted{color:var(--muted)}
 .small{font-size:12px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);border-radius:9px;background:#17243a;color:#eaf3ff;padding:10px 14px;font-weight:650;transition:.18s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);border-radius:9px;background:#5b151d;color:#eaf3ff;padding:10px 14px;font-weight:650;transition:.18s}
 .btn:hover{border-color:#52749e;transform:translateY(-1px)}
 .btn.primary{background:var(--accent);color:#071426;border-color:transparent}
 .btn.danger{color:#ff9b9b;background:#3b202c;border-color:#643244}
@@ -290,7 +290,7 @@ tbody tr:hover{background:#ffffff04}
       <section id="page-settings" class="hidden">
         <div class="page-head"><div><div class="eyebrow">Personnalisation</div><h1>Paramètres</h1><div class="muted">Adapte l'apparence du panel à ton service.</div></div></div>
         <div class="grid settings-grid">
-          <div class="panel"><h2>Thème visuel</h2><p class="muted small">Choisis la couleur principale des boutons et éléments actifs.</p><div class="color-row"><input id="accentColor" type="color" value="#55a6ff"><div><strong>Couleur d'accent</strong><div class="muted small">Couleur des actions et des indicateurs</div></div></div><button id="saveTheme" class="btn primary">Enregistrer le thème</button><button id="resetTheme" class="btn" style="margin-left:7px">Réinitialiser</button></div>
+          <div class="panel"><h2>Thème visuel</h2><p class="muted small">Choisis la couleur principale des boutons et éléments actifs.</p><div class="color-row"><input id="accentColor" type="color" value="#ef3944"><div><strong>Couleur d'accent</strong><div class="muted small">Couleur des actions et des indicateurs</div></div></div><button id="saveTheme" class="btn primary">Enregistrer le thème</button><button id="resetTheme" class="btn" style="margin-left:7px">Réinitialiser</button></div>
           <div class="panel"><h2>Session et accès</h2><p class="muted small">La connexion est gérée par Supabase et Discord. Le rôle Discord Accès Panel est vérifié côté serveur.</p><div class="pill"><span class="dot"></span>Authentification Discord</div><p class="muted small" id="sessionInfo" style="overflow-wrap:anywhere"></p><button id="settingsLogout" class="btn danger">Se déconnecter</button></div>
           <div class="panel"><h2>Conseils de confidentialité</h2><p class="muted small">N'enregistre que les informations nécessaires à la gestion RP. Évite les véritables données de santé, dossiers médicaux réels, mots de passe ou documents confidentiels de personnes réelles.</p></div>
         </div>
@@ -646,7 +646,7 @@ function renderGrades(){
   $("gradeList").innerHTML=grades.map((g,i)=>`<div class="activity"><div class="activity-icon">${i===0?"✦":"✳"}</div><div><p><strong>${esc(g.name)}</strong></p><small>Niveau ${esc(g.level)} · ${employees.filter(e=>String(e.grade_id)===String(g.id)).length} membre(s)</small></div><span class="pill" style="margin-left:auto">#${String(i+1).padStart(2,"0")}</span></div>`).join("");
 }
 function applyTheme(){
-  const c=localStorage.getItem("lsmc-accent")||"#55a6ff";
+  const c=localStorage.getItem("lsmc-accent")||"#ef3944";
   document.documentElement.style.setProperty("--accent",c);
   if($("accentColor"))$("accentColor").value=c;
 }
