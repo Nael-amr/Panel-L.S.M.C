@@ -6,7 +6,35 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>L.S.M.C. — EMS Management</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
+<style> 
+  /* Annuaire professionnel L.S.M.C. */
+.employee-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(260px,.8fr);gap:18px;align-items:start}
+.employee-directory{padding:0;overflow:hidden}
+.directory-toolbar{padding:18px 20px 0}
+.directory-table th,.directory-table td{padding:13px 12px}
+.directory-table th{background:#111d30}
+.directory-table td{font-size:12px}
+.person-cell{display:flex;align-items:center;gap:10px;min-width:170px}
+.person-avatar{width:36px;height:36px;flex-shrink:0;border-radius:11px;display:grid;place-items:center;background:#20334e;color:#dceeff;font-weight:800;overflow:hidden}
+.person-avatar img{width:100%;height:100%;object-fit:cover}
+.grade-tag{display:inline-flex;border:1px solid currentColor;border-radius:6px;padding:5px 8px;font-size:10px;font-weight:800}
+.presence{display:inline-flex;align-items:center;gap:6px;border-radius:100px;padding:6px 9px;font-size:10px;font-weight:800}
+.presence:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.presence.unknown{color:#c1cad7;background:#28364a}
+.presence.online{color:#74e3bd;background:#173c34}
+.presence.offline{color:#ff9b9b;background:#491b22}
+.hierarchy-heading td{padding:9px 14px;background:#0e1728;color:#91a4bc;font-size:10px;font-weight:850;letter-spacing:1px;text-transform:uppercase}
+.employee-side{display:grid;gap:16px}
+.side-stat{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.side-stat span{color:var(--muted);font-size:12px}
+.side-stat strong{font-size:12px;text-align:right}
+.channel-item{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}
+.channel-dot{width:8px;height:8px;border-radius:3px;background:#75bdff}
+.integration-note{font-size:11px;line-height:1.65;color:var(--muted);padding:12px;border-radius:10px;background:#0e1728;border:1px solid var(--line)}
+.grade-list-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.grade-swatch{width:5px;height:34px;border-radius:5px}
+@media(max-width:1150px){.employee-layout{grid-template-columns:1fr}.employee-side{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.employee-side{grid-template-columns:1fr}.directory-table th,.directory-table td{padding:10px}}
 :root{--bg:#100809;--side:#160a0c;--panel:#1c0e10;--panel2:#261014;--line:#492027;--blue:#ef3944;--text:#f5eeee;--muted:#c0a4a7;--accent:#ef3944}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}
@@ -234,10 +262,70 @@ tbody tr:hover{background:#ffffff04}
           </form>
         </div>
         <div class="panel" style="margin-top:18px">
-          <div class="panel-head"><div><h2>Annuaire du personnel</h2><div class="muted small" id="employeeSummary">Chargement…</div></div></div>
-          <div class="toolbar"><input id="employeeSearch" class="search" placeholder="⌕  Rechercher un nom, ID ou grade…"><select id="gradeFilter" style="max-width:230px"><option value="">Tous les grades</option></select></div>
-          <div id="employeeCards" class="grid employee-grid"></div>
+  <div class="panel-head">
+    <div>
+      <h2>Annuaire du personnel</h2>
+      <div class="muted small" id="employeeSummary">Chargement…</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input id="employeeSearch" class="search" placeholder="⌕ Rechercher un nom, ID ou grade…">
+    <select id="gradeFilter" style="max-width:230px">
+      <option value="">Tous les grades</option>
+    </select>
+  </div>
+
+  <div class="employee-layout">
+    <div class="employee-directory">
+      <div class="table-wrap">
+        <table class="directory-table">
+          <thead>
+            <tr>
+              <th>Employé</th>
+              <th>Grade</th>
+              <th>Statut</th>
+              <th>Service</th>
+              <th>Heures</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="employeeRows">
+            <tr><td colspan="6">Chargement du personnel…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="employee-side">
+      <div class="panel">
+        <h3>Suivi des services</h3>
+        <div class="side-stat">
+          <span>Employés en service</span>
+          <strong id="onDutyCount">—</strong>
         </div>
+        <div class="side-stat">
+          <span>Hors service</span>
+          <strong id="offDutyCount">—</strong>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Salons vocaux autorisés</h3>
+        <div class="channel-item">🚓 Service L.S.M.C.</div>
+        <div class="channel-item">📋 Briefing</div>
+        <div class="channel-item">🎓 Formation</div>
+        <p class="muted small">La synchronisation Discord sera ajoutée ultérieurement.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Intégration Discord</h3>
+        <p class="muted small">Le bot permettra de synchroniser les présences et les heures de service.</p>
+        <div class="integration-note">Bot non connecté</div>
+      </div>
+    </div>
+  </div>
+</div>
       </section>
 
       <section id="page-vehicles" class="hidden">
@@ -477,33 +565,91 @@ function resetEmployeeForm(){
   $("employeeSave").textContent="＋ Enregistrer le membre";$("employeeCancel").classList.add("hidden");
 }
 $("employeeCancel").addEventListener("click",resetEmployeeForm);
+const gradePalette = [
+  "#f0c674",
+  "#d8a0ff",
+  "#ff8585",
+  "#75bdff",
+  "#80dfb0",
+  "#ffad75",
+  "#a5b4fc",
+  "#c0c8d4"
+];
 
-function renderEmployees(){
-  const query=$("employeeSearch").value.toLowerCase();
-  const filter=$("gradeFilter").value;
-  const list=employees.filter(e=>
-    (!filter||String(e.grade_id)===filter)&&
-    `${e.first_name} ${e.last_name} ${e.in_game_id||""} ${gradeName(e.grade_id)}`.toLowerCase().includes(query)
-  );
-  $("employeeSummary").textContent=`${list.length} membre(s) affiché(s) · ${employees.length} au total`;
-  if(!list.length){$("employeeCards").innerHTML='<div class="empty" style="grid-column:1/-1"><span>♙</span>Aucun membre trouvé. Ajoute ton premier profil ci-dessus.</div>';return}
-  $("employeeCards").innerHTML=list.map(e=>`
-    <article class="panel employee-card">
-      <div class="employee-cover"></div>
-      <div class="employee-body">
-        ${e.photoUrl?`<img class="employee-photo" src="${esc(e.photoUrl)}" alt="Photo de ${esc(e.first_name)}">`:`<div class="employee-photo">${esc(initials(e.first_name,e.last_name))}</div>`}
-        <div class="employee-info"><div><h3>${esc(e.first_name)} ${esc(e.last_name)}</h3><div class="muted small">${esc(gradeName(e.grade_id))}</div></div><span class="status ${e.status==="Actif"?"":"inactive"}">${esc(e.status||"Actif")}</span></div>
-        <div class="employee-meta">
-  ⌁ ID en jeu : ${esc(e.in_game_id||"—")}<br>
-  Discord : ${esc(e.discord_id||"—")}<br>
-  ▦ Naissance : ${dateText(e.birth_date)}<br>
-  ＋ Recrutement : ${dateText(e.recruited_at)}
-</div>
-        <div class="card-actions"><button class="btn small-btn" data-edit-employee="${e.id}">Modifier</button><button class="btn danger small-btn" data-delete-employee="${e.id}">Supprimer</button></div>
-      </div>
-    </article>`).join("");
-  document.querySelectorAll("[data-edit-employee]").forEach(b=>b.onclick=()=>editEmployee(b.dataset.editEmployee));
-  document.querySelectorAll("[data-delete-employee]").forEach(b=>b.onclick=()=>deleteEmployee(b.dataset.deleteEmployee));
+function gradeColor(id) {
+  const index = grades.findIndex(g => String(g.id) === String(id));
+  return gradePalette[index >= 0 ? index % gradePalette.length : 7];
+}
+function renderEmployees() {
+  const query = $("employeeSearch").value.toLowerCase();
+  const filter = $("gradeFilter").value;
+
+  const list = employees
+    .filter(e =>
+      (!filter || String(e.grade_id) === filter) &&
+      `${e.first_name} ${e.last_name} ${e.in_game_id || ""} ${gradeName(e.grade_id)}`
+        .toLowerCase()
+        .includes(query)
+    )
+    .sort((a, b) => {
+      const gradeA = grades.find(g => String(g.id) === String(a.grade_id));
+      const gradeB = grades.find(g => String(g.id) === String(b.grade_id));
+      return (gradeB?.level || 0) - (gradeA?.level || 0);
+    });
+
+  $("employeeSummary").textContent =
+    `${list.length} membre(s) affiché(s) · ${employees.length} au total`;
+
+  $("employeeRows").innerHTML = list.length
+    ? list.map(e => {
+        const color = gradeColor(e.grade_id);
+
+        return `
+          <tr>
+            <td>
+              <div class="person-cell">
+                <div class="person-avatar" style="border-color:${color};color:${color}">
+                  ${esc(initials(e.first_name, e.last_name))}
+                </div>
+                <div>
+                  <strong>${esc(e.first_name)} ${esc(e.last_name)}</strong>
+                  <div class="muted small">ID : ${esc(e.in_game_id || "—")}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="grade-tag" style="border-color:${color};color:${color}">
+                ${esc(gradeName(e.grade_id))}
+              </span>
+            </td>
+            <td>
+              <span class="status ${e.status === "Actif" ? "" : "inactive"}">
+                ${esc(e.status || "Actif")}
+              </span>
+            </td>
+            <td><span class="presence">Non synchronisé</span></td>
+            <td>—</td>
+            <td>
+              <div class="card-actions">
+                <button class="btn small-btn" data-edit-employee="${e.id}">Modifier</button>
+                <button class="btn danger small-btn" data-delete-employee="${e.id}">Supprimer</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("")
+    : `<tr><td colspan="6" class="empty">Aucun membre trouvé.</td></tr>`;
+
+  $("onDutyCount").textContent = "—";
+  $("offDutyCount").textContent = "—";
+
+  document.querySelectorAll("[data-edit-employee]").forEach(button => {
+    button.onclick = () => editEmployee(button.dataset.editEmployee);
+  });
+
+  document.querySelectorAll("[data-delete-employee]").forEach(button => {
+    button.onclick = () => deleteEmployee(button.dataset.deleteEmployee);
+  });
 }
 $("employeeSearch").addEventListener("input",renderEmployees);
 $("gradeFilter").addEventListener("change",renderEmployees);
